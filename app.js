@@ -16,10 +16,47 @@ var budgetController = (function () {
     this.value = value;
   };
 
-  var allExpenses = [];
-  var allIncomes = [];
-  var totalExpenses = 0;
-  
+  var data = {
+    allItems: {
+      exp: [],
+      inc: []
+    },
+    totals: {
+      exp: 0,
+      inc: 0
+    }
+
+  };
+
+  return {
+    addItem: function (type, des, val) {
+      var newItem, ID;
+
+      // ID = last ID + 1
+      if (data.allItems[type].length > 0) {
+        ID = data.allItems[type][data.allItems[type].length - 1].id + 1;
+      } else {
+        ID = 0;
+      }
+
+      // create new item
+      if (type === 'exp') {
+        newItem = new Expense(ID, des, val);
+      } else {
+        newItem = new Income(ID, des, val)
+      }
+
+      // push item into data
+      data.allItems[type].push(newItem);
+
+      // return the item
+      return newItem;
+    },
+    testing: function () {
+      console.log(data);
+    }
+  };
+
 })();
 
 // controls UI
@@ -39,6 +76,21 @@ var UIController = (function () {
         desc: document.querySelector(DOMstrings.inputDesc).value,
         value: document.querySelector(DOMstrings.inputValue).value
       };
+    },
+    addListItem: function (obj, type) {
+      var html;
+      // create html string with placeholder text
+
+      if (type === 'inc') {
+        html = '<div class="item clearfix" id="income-%id%"> <div class="item__description">Salary</div><div class="right clearfix"><div class="item__value">+ 2,100.00</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
+      } else {
+        html = '<div class="item clearfix" id="expense-%id%"><div class="item__description">Apartment rent</div><div class="right clearfix"><div class="item__value">- 900.00</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
+      }
+
+      // replace place holder text with some actual data
+
+      // insert html into the DOM
+
     },
     getDOMstrings: function () {
       return DOMstrings;
@@ -65,10 +117,14 @@ var controller = (function (budgetCtrl, UICtrl) {
   };
 
   var ctrlAddItem = function () {
+    var input, newItem;
+
     // 1. get input data
-    var input = UICtrl.getInput();
+    input = UICtrl.getInput();
     console.log(input);
+
     // 2. add item to budget controller
+    newItem = budgetCtrl.addItem(input.type, input.desc, input.value);
 
     // 3. add the item to the UI
 
